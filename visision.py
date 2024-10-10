@@ -2,12 +2,16 @@ import streamlit as st
 import os
 import google.generativeai as genai
 from PIL import Image
+import time
+
+start_time = time.time()
 
 # Configure Gemini Pro Model with API key
 genai.configure(api_key="AIzaSyBrxhz_lJ34ufi1sJPi2n_b5RpSILB5Nas")
 
 # Function to load Gemini Pro Model and get a response
 model = genai.GenerativeModel("gemini-1.5-flash")
+
 
 def get_gemini_response(cooking_time, meal_type, diet_preference, image):
     prompt = f"""
@@ -21,6 +25,7 @@ def get_gemini_response(cooking_time, meal_type, diet_preference, image):
         response = model.generate_content(prompt)
     return response.text
 
+
 # Initialize Streamlit app
 st.set_page_config(page_title="Gemini Recipe App")
 st.header("Gemini Recipe Generator")
@@ -32,10 +37,15 @@ cooking_time = st.slider("Select Cooking Time (minutes):", 5, 60, step=5)
 meal_type = st.selectbox("Select Meal Type:", options=["Breakfast", "Lunch", "Dinner"])
 
 # Option 3: Single select for dietary preference
-diet_preference = st.selectbox("Select Dietary Preference:", options=["Vegetarian with Egg", "Only Chicken", "Only Sea Food", "Pure Vegetarian"])
+diet_preference = st.selectbox(
+    "Select Dietary Preference:",
+    options=["Vegetarian with Egg", "Only Chicken", "Only Sea Food", "Pure Vegetarian"],
+)
 
 # File uploader for image
-uploaded_file = st.file_uploader("Choose an image (optional):", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader(
+    "Choose an image (optional):", type=["jpg", "jpeg", "png"]
+)
 image = None
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
@@ -50,3 +60,9 @@ if submit or regenerate:
     response = get_gemini_response(cooking_time, meal_type, diet_preference, image)
     st.subheader("Gemini Recipe:")
     st.write(response)
+
+
+# your Streamlit code
+end_time = time.time()
+latency = end_time - start_time
+print(f"Latency: {latency * 1000} ms")  # Convert to ms
